@@ -1,0 +1,36 @@
+{if $tags}
+<style type="text/css">
+
+.tags3d_title{
+    text-align: center;
+    font-weight: bold;
+    margin: 10px 0px;
+}
+
+</style>
+
+
+<script src="{$wa_app_static_url}plugins/tags3d/js/tagcanvas.js" type="text/javascript"></script>
+
+
+<div class="tags3d_title">Облако тегов</div>
+<canvas width="{$settings.width}" height="{$settings.height}" id="tagCloudh5">
+{foreach from=$tags item=tag}
+<a href="{$wa_app_url}tag/{$tag.uri_name}/" style="font-size: {$tag.size}%; opacity: {$tag.opacity}">{$tag.name|escape}</a>
+{/foreach}
+</canvas>
+
+
+<script type="text/javascript">
+
+try {
+    TagCanvas.maxSpeed = {$settings.speed};
+    TagCanvas.textColour = '#{$settings.tag_color}';
+    TagCanvas.outlineColour = '#{$settings.color_outline}';
+    TagCanvas.Start('tagCloudh5');
+} catch(err) {
+}
+
+	
+ </script>
+{/if}

@@ -1,0 +1,173 @@
+<style type="text/css">
+    #wa .CodeMirror{
+        border: 1px solid #eee;
+    }
+    .CodeMirror-scroll {
+        height: auto;
+        overflow-y: hidden;
+        overflow-x: auto;
+    }
+</style>
+<div class="block double-padded">
+<h1>3D Облако тегов</h1>
+<div     class="fields form">
+    <form action="?plugin=tags3d&action=save" method="post" id="plugins-settings-form">
+    {$wa->csrf()}
+    
+    {literal}
+    <p>{shopTags3dPlugin::display()} - Код хелпера вывода</p>
+    {/literal}
+    <p class="gray">
+    <i class="icon16 exclamation"></i>
+    Используя этот код Вы можете осуществить вывод "3D облака тегов" в любом месте вашей темы оформления, это позволяет избавиться от привязки к конкретным местам вывода плагина
+    </p>
+
+    <div class="field">
+        <div class="name">
+            Статус
+        </div>
+        <div class="value">
+            <select name="shop_tags3d[status]">
+                <option {if $vals.status == 0} selected=""{/if} value="0">Выключен</option>
+                <option {if $vals.status == 1} selected=""{/if} value="1">Включен</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="name">
+            Вывод плагина в стандартном месте
+        </div>
+        <div class="value">
+            <select name="shop_tags3d[default_output]">
+                <option {if $vals.default_output == 1} selected="selected"{/if} value="1">Включен</option>
+                <option {if $vals.default_output == 0} selected="selected"{/if} value="0">Выключен</option>
+            </select>
+            <p class="gray">
+            <i class="icon16 exclamation"></i>
+            Вы можете отключить стандартный вывод, это может быть полезно если вы используете хелпер вывода
+            </p>
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="name">
+            Максимальное количество тегов
+        </div>
+        <div class="value">
+            <input type="text" name="shop_tags3d[count]" value="{$vals.count|escape}" />
+        </div>
+
+    </div>
+    
+    <div class="field">
+        <div class="name">
+            Скорость вращения
+        </div>
+        <div class="value">
+            <input type="text" name="shop_tags3d[speed]" value="{$vals.speed|escape}" />
+            <p class="hint">0.01 - очень медленно, 1 - быстро</p>
+        </div>
+
+    </div>
+    
+    <div class="field">
+        <div class="name">
+            Цвет тегов
+        </div>
+        <div class="value">
+            <input type="text" name="shop_tags3d[tag_color]" value="{$vals.tag_color|escape}" /> 
+        </div>
+    </div>
+    
+    <div class="field">
+        <div class="name">
+            Цвет рамки вокруг тега
+        </div>
+        <div class="value">
+            <input type="text" name="shop_tags3d[color_outline]" value="{$vals.color_outline|escape}" />
+        </div>
+
+    </div>
+    
+    <div class="field">
+        <div class="name">
+            Ширина облака
+        </div>
+        <div class="value">
+            <input type="text" name="shop_tags3d[width]" value="{$vals.width|escape}" />
+        </div>
+
+    </div>
+    
+    <div class="field">
+        <div class="name">
+            Высота облака
+        </div>
+        <div class="value">
+            <input type="text" name="shop_tags3d[height]" value="{$vals.height|escape}" />
+        </div>
+
+    </div>
+
+
+    <div class="field">
+        <div class="name">Шаблон<br /><span class="hint">HTML + Smarty</span></div>
+        <div class="value no-shift">
+            <div id="s-editor-core-wrapper">
+                <textarea id="sf-template" class="body" name="template">{$template}</textarea>
+            </div>
+        </div>
+        
+        {if $change_tpl}
+        <div class="value">
+            <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+            <input type="checkbox" name="reset_tpl" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+        </div>
+        {/if}
+    </div>
+
+    
+    <div class="field">
+        <div class="value submit">
+            <input type="submit" class="button green" value="Сохранить">
+            <span id="plugins-settings-form-status" style="display:none">
+                <i style="vertical-align:middle" class="icon16 yes"></i> [`Saved`]
+            </span>
+        </div>
+    </div>
+    </form>
+</div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        var c = CodeMirror.fromTextArea(document.getElementById('sf-template'), {
+            mode: "text/html",
+            tabMode: "indent",
+            height: "dynamic",
+            lineWrapping: true
+        });
+        $("#sf-template").change(function() {
+            c.setValue($(this).val())
+        });
+        $("#sf-settings").submit(function () {
+            var f = $(this);
+            $.post(f.attr('action'), f.serialize(), function (response) {
+                if(response.status == 'ok') {
+                    $('#wa-design-button').removeClass('red').addClass('green');
+                    $("#wa-editor-status-fail").hide()
+                    $("#wa-editor-status-ok span").html(response.data.message);
+                    $("#wa-editor-status-ok").fadeIn('slow', function () {
+                        $(this).fadeOut(1000);
+                    });
+                } else {
+                    $('#wa-design-button').removeClass('green').addClass('red');
+                    $("#wa-editor-status-ok").hide();
+                    $("#wa-editor-status-fail span").html(response.errors.join(', '));
+                    $("#wa-editor-status-fail").fadeIn('slow');
+                }
+            }, "json")
+            return false;
+        });
+    });
+</script>
